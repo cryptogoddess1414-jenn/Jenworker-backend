@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jenworker — Find your next clients | Agentic Builder</title>
+<style>
+  /* #region tokens */
+  :root {
+    --ink: #0b1224;          /* deep navy base */
+    --ink-2: #131c36;        /* raised navy */
+    --paper: #f7f5f0;        /* warm off-white */
+    --gold: #c9a24b;         /* brand gold */
+    --gold-soft: #e8d9ae;
+    --line: rgba(201,162,75,.25);
+    --muted: #9aa3b8;
+    --danger: #d06552;
+    --radius: 14px;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  /* #endregion tokens */
+
+  /* #region base */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--ink); color: var(--paper); font-family: var(--sans); line-height: 1.55; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+  section { padding: 56px 0; }
+  h2 { font-family: var(--serif); font-weight: 500; font-size: 1.7rem; margin-bottom: 10px; }
+  .eyebrow { font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  /* #endregion base */
+
+  /* #region nav */
+  header { position: sticky; top: 0; z-index: 50; background: rgba(11,18,36,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; max-width: 680px; margin: 0 auto; }
+  .logo { font-family: var(--serif); font-size: 1.35rem; letter-spacing: .02em; }
+  .logo .mark { color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .btn { border: 0; border-radius: 999px; padding: 10px 20px; font-size: .92rem; font-weight: 600; transition: transform .15s ease; }
+  .btn:active { transform: scale(.97); }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-ghost { background: transparent; color: var(--paper); border: 1px solid var(--line); }
+  .menu-btn { background: none; border: 0; color: var(--paper); font-size: 1.5rem; line-height: 1; padding: 4px 8px; }
+  .menu { display: none; position: fixed; inset: 0; top: 61px; background: var(--ink); z-index: 40; overflow-y: auto; padding: 28px 20px 40px; }
+  .menu.open { display: block; }
+  .menu .eyebrow { margin-top: 8px; }
+  .menu a { display: block; padding: 14px 0; font-size: 1.15rem; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .menu .tag { display: inline-block; margin-left: 8px; font-size: .68rem; padding: 2px 9px; border-radius: 999px; background: var(--gold); color: var(--ink); font-weight: 700; vertical-align: middle; }
+  .menu .menu-ctas { display: grid; gap: 12px; margin-top: 26px; }
+  .menu .menu-ctas .btn { width: 100%; padding: 14px; font-size: 1rem; }
+  /* #endregion nav */
+
+  /* #region hero */
+  .hero { padding: 64px 0 40px; text-align: center; }
+  .hero h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(2.4rem, 9vw, 3.4rem); line-height: 1.12; margin-bottom: 20px; }
+  .hero h1 em { font-style: italic; color: var(--gold); }
+  .hero .sub { color: var(--muted); font-size: 1.06rem; max-width: 34em; margin: 0 auto 32px; }
+  .mode-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .mode { border-radius: 999px; padding: 10px 18px; font-size: .88rem; background: var(--ink-2); color: var(--muted); border: 1px solid transparent; }
+  .mode[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; }
+  .mode .auto { font-size: .64rem; font-weight: 700; letter-spacing: .08em; color: var(--gold); margin-left: 6px; }
+  .prompt-box { background: var(--paper); border-radius: 20px; padding: 16px; text-align: left; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+  .prompt-box textarea { width: 100%; border: 0; resize: none; background: transparent; color: var(--ink); font-size: 1.05rem; font-family: inherit; min-height: 96px; }
+  .prompt-box textarea:focus { outline: none; }
+  .prompt-foot { display: flex; justify-content: flex-end; }
+  .send-btn { width: 44px; height: 44px; border-radius: 12px; border: 0; background: var(--ink); color: var(--gold); font-size: 1.2rem; }
+  .hero .note { margin-top: 22px; color: var(--muted); font-size: .9rem; }
+  /* #endregion hero */
+
+  /* #region result */
+  #result { display: none; text-align: left; background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; margin-top: 20px; }
+  #result h3 { font-family: var(--serif); font-size: 1.25rem; margin-bottom: 10px; }
+  #result p, #result li { font-size: .95rem; color: var(--paper); margin-bottom: 8px; }
+  #result strong { color: var(--gold-soft); }
+  #result ol { padding-left: 20px; margin-bottom: 12px; }
+  #result .btn { margin-top: 8px; }
+  #result .err { color: var(--danger); }
+  /* #endregion result */
+
+  /* #region verticals */
+  .verticals .lede { color: var(--muted); margin-bottom: 26px; }
+  .chips { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .chip { display: inline-flex; align-items: baseline; gap: 10px; border: 1px solid var(--line); border-radius: 999px; padding: 12px 20px; background: var(--ink-2); font-size: 1rem; }
+  .chip .k { color: var(--muted); font-size: .82rem; letter-spacing: .04em; }
+  .chip .n { color: var(--gold); font-weight: 700; }
+  .more { color: var(--muted); font-size: .9rem; margin-top: 14px; }
+  /* #endregion verticals */
+
+  /* #region waterfalls */
+  .panel { background: var(--ink-2); border: 1px solid var(--line); border-radius: 18px; padding: 22px; margin-bottom: 24px; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .panel-title { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 1.1rem; }
+  .panel-title .ic { width: 40px; height: 40px; border-radius: 12px; background: rgba(201,162,75,.15); display: grid; place-items: center; font-size: 1.1rem; }
+  .panel-head .count { font-family: monospace; color: var(--muted); font-size: .85rem; }
+  .steps { list-style: none; }
+  .steps li { display: flex; align-items: center; gap: 14px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .steps li:last-child { border-bottom: 0; }
+  .steps .num { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font-size: .82rem; color: var(--muted); flex-shrink: 0; }
+  .steps .slot { color: var(--muted); font-style: italic; }
+  .panel .fine { color: var(--muted); font-size: .9rem; margin-top: 14px; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; font-size: .88rem; color: var(--gold-soft); }
+  /* #endregion waterfalls */
+
+  /* #region footer-cta */
+  .final { text-align: center; border-top: 1px solid var(--line); }
+  .final .btn { padding: 14px 34px; font-size: 1rem; }
+  footer { padding: 28px 0 44px; text-align: center; color: var(--muted); font-size: .82rem; }
+  /* #endregion footer-cta */
+
+  /* #region modal */
+  .overlay { position: fixed; inset: 0; background: rgba(4,8,18,.7); display: none; align-items: center; justify-content: center; z-index: 99; padding: 20px; }
+  .overlay.open { display: flex; }
+  .modal { background: var(--paper); color: var(--ink); border-radius: 18px; padding: 28px; width: 100%; max-width: 360px; }
+  .modal h3 { font-family: var(--serif); margin-bottom: 6px; }
+  .modal p { font-size: .92rem; color: #555; margin-bottom: 18px; }
+  .modal input { width: 100%; padding: 13px; border: 1px solid #ccc; border-radius: 10px; font-size: 1rem; margin-bottom: 12px; }
+  .modal .btn { width: 100%; padding: 13px; background: var(--ink); color: var(--paper); }
+  .modal .msg { margin-top: 10px; font-size: .88rem; min-height: 1.2em; }
+  /* #endregion modal */
+</style>
+</head>
+<body>
+
+<!-- #region header -->
+<header>
+  <div class="nav">
+    <a class="logo" href="#" data-sm="logo"><span class="mark">◢</span> Jenworker</a>
+    <div class="nav-right">
+      <button class="btn btn-gold cta" data-sm="nav-cta">Start free →</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<nav class="menu" id="menu" data-sm="mobile-menu">
+  <p class="eyebrow">Product</p>
+  <a href="#prompt">Lead generation</a>
+  <a href="#waterfalls">Data enrichment</a>
+  <a href="#verticals">Verticals</a>
+  <a href="#">Outreach <span class="tag">New</span></a>
+  <p class="eyebrow" style="margin-top:28px">Company</p>
+  <a href="#">Pricing</a>
+  <a href="#">Guide</a>
+  <a href="#" class="cta">Book a demo</a>
+  <div class="menu-ctas">
+    <button class="btn btn-ghost cta">Sign in</button>
+    <button class="btn btn-gold cta">Start free</button>
+  </div>
+</nav>
+<!-- #endregion header -->
+
+<!-- #region hero -->
+<section class="hero wrap">
+  <h1>Your next client is <em>already out there.</em></h1>
+  <p class="sub">Describe your ideal customer and Jenworker builds the targeting profile,
+  maps the search, and drafts the outreach — before you've finished your coffee.</p>
+
+  <div class="mode-row" role="group" aria-label="Input mode">
+    <button class="mode" data-mode="profile" aria-pressed="true">✎ Describe a customer</button>
+    <button class="mode" data-mode="domain" aria-pressed="false">⌂ Use my domain <span class="auto">AUTO</span></button>
+  </div>
+
+  <div class="prompt-box" data-sm="prompt-box">
+    <textarea id="promptInput" placeholder="e.g. Boutique real estate brokerages in NYC with 5–20 agents…" aria-label="Describe your ideal customer"></textarea>
+    <div class="prompt-foot">
+      <button class="send-btn" id="promptSubmit" aria-label="Generate lead plan">↑</button>
+    </div>
+  </div>
+
+  <div id="result" aria-live="polite"></div>
+
+  <p class="note">Try it free — no credit card required.</p>
+</section>
+<!-- #endregion hero -->
+
+<!-- #region verticals -->
+<section class="verticals wrap" id="verticals">
+  <p class="eyebrow">Verticals</p>
+  <h2>If you can describe the customer, we can find them.</h2>
+  <p class="lede">Purpose-built targeting across the industries we know best.</p>
+  <div class="chips" data-sm="vertical-chips">
+    <span class="chip"><span class="k">Targeting</span> Real Estate <span class="n">28</span></span>
+    <span class="chip"><span class="k">Targeting</span> Legal <span class="n">16</span></span>
+    <span class="chip"><span class="k">Targeting</span> Healthcare <span class="n">22</span></span>
+    <span class="chip"><span class="k">Targeting</span> Finance <span class="n">19</span></span>
+    <span class="chip"><span class="k">Targeting</span> E-commerce <span class="n">24</span></span>
+  </div>
+  <p class="more">and more</p>
+</section>
+<!-- #endregion verticals -->
+
+<!-- #region waterfalls -->
+<section class="wrap" id="waterfalls">
+  <p class="eyebrow">Data quality</p>
+  <h2>Verified before it ever reaches you.</h2>
+  <p class="lede" style="color:var(--muted);margin-bottom:26px">Every contact runs through a provider waterfall — first verified result wins.</p>
+
+  <div class="panel" data-sm="email-waterfall">
+    <div class="panel-head">
+      <span class="panel-title"><span class="ic">✉</span> Email waterfall</span>
+      <span class="count">providers</span>
+    </div>
+    <ol class="steps">
+      <li><span class="num">1</span> Apollo</li>
+      <!-- Add real providers here as you integrate them -->
+      <li><span class="num">2</span> <span class="slot">Provider slot</span></li>
+      <li><span class="num">3</span> <span class="slot">Provider slot</span></li>
+    </ol>
+    <p class="fine">First verified result wins. Unvalidated addresses are never delivered.</p>
+    <span class="badge">✓ Bounce-validated</span>
+  </div>
+
+  <div class="panel" data-sm="phone-waterfall">
+    <div class="panel-head">
+      <span class="panel-title"><span class="ic">☏</span> Phone waterfall</span>
+      <span class="count">providers</span>
+    </div>
+    <ol class="steps">
+      <li><span class="num">1</span> Apollo</li>
+      <li><span class="num">2</span> <span class="slot">Provider slot</span></li>
+      <li><span class="num">3</span> <span class="slot">Provider slot</span></li>
+    </ol>
+    <p class="fine">Mobile and work numbers, validated before delivery.</p>
+    <span class="badge">✓ Real-time validated</span>
+  </div>
+</section>
+<!-- #endregion waterfalls -->
+
+<!-- #region final-cta -->
+<section class="final wrap">
+  <h2>Start finding clients today.</h2>
+  <p style="color:var(--muted);margin-bottom:24px">Free to try. No credit card required.</p>
+  <button class="btn btn-gold cta" data-sm="final-cta">Start free →</button>
+</section>
+
+<footer>Jenworker · an Agentic Builder product · © 2026 Goddessai26 LLC</footer>
+<!-- #endregion final-cta -->
+
+<!-- #region modal -->
+<div class="overlay" id="captureOverlay">
+  <div class="modal">
+    <h3>Start free</h3>
+    <p>No credit card required. We'll send your first lead plan to your inbox.</p>
+    <input type="email" id="capEmail" placeholder="you@company.com" aria-label="Email address">
+    <button class="btn" id="capGo">Create my account</button>
+    <p class="msg" id="capMsg"></p>
+  </div>
+</div>
+<!-- #endregion modal -->
+
+<script>
+// #region config
+const API_BASE = ""; // e.g. "https://jenworker-api.up.railway.app" if frontend is on Vercel
+// #endregion config
+
+// #region menu
+const menuBtn = document.getElementById("menuBtn");
+const menu = document.getElementById("menu");
+menuBtn.addEventListener("click", () => {
+  const open = menu.classList.toggle("open");
+  menuBtn.setAttribute("aria-expanded", open);
+  menuBtn.textContent = open ? "✕" : "☰";
+});
+menu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+  menu.classList.remove("open");
+  menuBtn.textContent = "☰";
+  menuBtn.setAttribute("aria-expanded", "false");
+}));
+// #endregion menu
+
+// #region mode
+let mode = "profile";
+const modeBtns = document.querySelectorAll(".mode");
+const promptInput = document.getElementById("promptInput");
+modeBtns.forEach(b => b.addEventListener("click", () => {
+  modeBtns.forEach(x => x.setAttribute("aria-pressed", "false"));
+  b.setAttribute("aria-pressed", "true");
+  mode = b.dataset.mode;
+  promptInput.placeholder = mode === "domain"
+    ? "e.g. agenticbuilder.net — we'll infer your ideal customer"
+    : "e.g. Boutique real estate brokerages in NYC with 5–20 agents…";
+}));
+// #endregion mode
+
+// #region prospect
+const resultEl = document.getElementById("result");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+function show(html) { resultEl.style.display = "block"; resultEl.innerHTML = html; }
+
+async function runProspect() {
+  const prompt = promptInput.value.trim();
+  if (!prompt) return show('<p class="err">Describe the lead you want to find first.</p>');
+  show("<p>Building your lead plan…</p>");
+  try {
+    const r = await fetch(`${API_BASE}/api/prospect`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ prompt, mode })
+    });
+    const data = await r.json();
+    if (!r.ok) return show(`<p class="err">${esc(data.error || "Something went wrong.")}</p>`);
+    const x = data.result;
+    show(`
+      <h3>${esc(x.icp.title)}</h3>
+      <p><strong>Industries:</strong> ${x.icp.industries.map(esc).join(", ")}</p>
+      <p><strong>Company size:</strong> ${esc(x.icp.company_size)}</p>
+      <p><strong>Buying signals:</strong> ${x.icp.signals.map(esc).join("; ")}</p>
+      <p><strong>Search plan</strong></p>
+      <ol>${x.search_plan.map(s => `<li>${esc(s)}</li>`).join("")}</ol>
+      <p><strong>Sample outreach — ${esc(x.sample_outreach.subject)}</strong></p>
+      <p>${esc(x.sample_outreach.body)}</p>
+      <button class="btn btn-gold" id="claimBtn">Get these leads → Start free</button>
+    `);
+    document.getElementById("claimBtn").addEventListener("click", () => openCapture(prompt));
+  } catch {
+    show('<p class="err">Network error — try again.</p>');
+  }
+}
+document.getElementById("promptSubmit").addEventListener("click", runProspect);
+promptInput.addEventListener("keydown", e => {
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) runProspect();
+});
+// #endregion prospect
+
+// #region capture
+const overlay = document.getElementById("captureOverlay");
+const capMsg = document.getElementById("capMsg");
+let lastPrompt = "";
+
+function openCapture(prompt) {
+  lastPrompt = prompt || "";
+  capMsg.textContent = "";
+  overlay.classList.add("open");
+  document.getElementById("capEmail").focus();
+}
+overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
+document.querySelectorAll(".cta").forEach(c =>
+  c.addEventListener("click", e => { e.preventDefault(); openCapture(promptInput.value.trim()); })
+);
+
+document.getElementById("capGo").addEventListener("click", async () => {
+  const email = document.getElementById("capEmail").value.trim();
+  capMsg.textContent = "Saving…";
+  try {
+    const r = await fetch(`${API_BASE}/api/leads`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email, source: "jenworker-cta", prompt: lastPrompt })
+    });
+    const data = await r.json();
+    capMsg.textContent = r.ok ? "You're in — check your inbox." : (data.error || "Couldn't save. Try again.");
+    if (r.ok) setTimeout(() => overlay.classList.remove("open"), 1500);
+  } catch {
+    capMsg.textContent = "Network error — try again.";
+  }
+});
+// #endregion capture
+</script>
+</body>
+</html>
